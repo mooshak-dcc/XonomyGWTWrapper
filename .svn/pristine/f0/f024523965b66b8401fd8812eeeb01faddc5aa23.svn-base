@@ -1,0 +1,67 @@
+
+@url add addPng;
+@url bulletArrowDown bulletArrowDownPng;
+@url bulletArrowUp bulletArrowUpPng;
+@url callout calloutGif;
+@url draghandle draghandleGif;
+@url exclamation exclamationPng;
+@url loader loaderGif;
+@url magnifier magnifierPng;
+@url minus minusGif;
+@url plus plusGif;
+
+.xonomy.laic .element > .connector > .plusminus,
+.xonomy.nerd .element > .connector > .plusminus {
+	background-image: minus;
+}
+
+.xonomy.laic .element.collapsed > .connector > .plusminus,
+.xonomy.nerd .element.collapsed > .connector > .plusminus {
+	background-image: plus;
+}
+		
+.xonomy.laic .connector > .draghandle,
+.xonomy.nerd .connector > .draghandle {
+	background-image: draghandle;
+}
+		
+.xonomy.laic .warner .inside,
+.xonomy.nerd .warner .inside {
+	background-image: exclamation;
+}
+		
+.xonomy.laic .rollouter,
+.xonomy.nerd .rollouter { 
+	background-image: bulletArrowDown;
+}
+		
+.xonomy.laic .rollouter.rolledout,
+.xonomy.nerd .rollouter.rolledout {
+	background-image: bulletArrowUp;
+}
+		
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem div.menuLabel,
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem div.menuLabel {
+	background-image: plus;
+}
+		
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem.expanded div.menuLabel,
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded div.menuLabel {
+	background-image: minus;
+}
+		
+#xonomyBubble.laic button.buttonSearch,
+#xonomyBubble.nerd button.buttonSearch {
+	background-image: magnifier;
+}
+		
+#xonomyBubble.laic button.buttonCreate,
+#xonomyBubble.nerd button.buttonCreate {
+	background-image: add;
+}
+		
+#xonomyBubble .wyc, 
+.xonomy .wyc {
+	background-image: loader;
+}
+		

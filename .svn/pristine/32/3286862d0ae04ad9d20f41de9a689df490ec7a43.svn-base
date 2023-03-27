@@ -1,0 +1,42 @@
+package pt.up.fc.dcc.xonomygwt.client;
+
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.RootPanel;
+
+import pt.up.fc.dcc.xonomygwt.client.resources.Resources;
+import pt.up.fc.dcc.xonomygwt.client.wrapper.XonomyGWTWrapper;
+
+/**
+ * Entry point classes define <code>onModuleLoad()</code>.
+ */
+public class XonomyGWTWrapperTest implements EntryPoint {
+	/**
+	 * The message displayed to the user when the server cannot be reached or
+	 * returns an error.
+	 */
+	private static final String SERVER_ERROR = "An error occurred while "
+			+ "attempting to contact the server. Please check your network " + "connection and try again.";
+
+	/**
+	 * This is the entry point method.
+	 */
+	public void onModuleLoad() {
+		final XonomyGWTWrapper xonomyGWTWrapper = new XonomyGWTWrapper();
+
+		RootPanel.get("wrapper").add(xonomyGWTWrapper);
+
+		XonomyGWTWrapper.render("<list><item label='one'/><item label='two'/></list>", 
+				XonomyGWTWrapper.DEFAULT_EDITOR_ID, Resources.INSTANCE.exampleDocspecJson().getText());
+		
+		xonomyGWTWrapper.addValueChangeHandler(new ValueChangeHandler<String>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				Window.alert(event.getValue());
+			}
+		});
+	}
+}

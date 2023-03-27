@@ -1,0 +1,122 @@
+function onReady(method) {
+	if (document.readyState === 'complete') { // or also compare to
+												// 'interactive'
+		setTimeout(method, 1); // schedule to run immediately
+	} else {
+		readyStateCheckInterval = setInterval(function() {
+			if (document.readyState === 'complete') { // or also compare to
+														// 'interactive'
+				clearInterval(readyStateCheckInterval);
+				method();
+			}
+		}, 10);
+	}
+}
+
+/* Overrides to Xonomy */
+
+Xonomy.verifyDocSpec=function() { //make sure the docSpec object has everything it needs
+	if(!Xonomy.docSpec || typeof(Xonomy.docSpec)!="object") Xonomy.docSpec={};
+	if(!Xonomy.docSpec.elements || typeof(Xonomy.docSpec.elements)!="object") Xonomy.docSpec.elements={};
+	if(Xonomy.docSpec.onchange && typeof(Xonomy.docSpec.onchange)=="string" && typeof(eval(Xonomy.docSpec.onchange))=="function")
+		Xonomy.docSpec.onchange=eval(Xonomy.docSpec.onchange)
+	else if(!Xonomy.docSpec.onchange || typeof(Xonomy.docSpec.onchange)!="function") Xonomy.docSpec.onchange=function(){};
+	if(Xonomy.docSpec.validate && typeof(Xonomy.docSpec.validate)=="string" && typeof(eval(Xonomy.docSpec.validate))=="function")
+		Xonomy.docSpec.validate=eval(Xonomy.docSpec.validate)
+	else if(!Xonomy.docSpec.validate || typeof(Xonomy.docSpec.validate)!="function") Xonomy.docSpec.validate=function(){};
+};
+Xonomy.asFunction=function(specProperty, defaultValue){
+	if(typeof(specProperty)=="function")
+		return specProperty;
+	if(typeof(specProperty)=="string"){
+		try {
+			if(typeof(eval(specProperty))=="function")
+				return eval(specProperty);
+		} catch(err) { }
+	}		
+	if (typeof(specProperty)==typeof(defaultValue))
+		return function() { return specProperty; }
+	return function() { return defaultValue };
+}
+Xonomy.verifyDocSpecElement=function(name) { //make sure the DocSpec object has such an element, that the element has everything it needs
+	if(!Xonomy.docSpec.elements[name] || typeof(Xonomy.docSpec.elements[name])!="object") {
+		if(Xonomy.docSpec.unknownElement) {
+			Xonomy.docSpec.elements[name]=(typeof(Xonomy.docSpec.unknownElement)==="function")
+				? Xonomy.docSpec.unknownElement(name)
+				: Xonomy.docSpec.unknownElement;
+		}
+		else Xonomy.docSpec.elements[name]={};
+	}
+	var spec=Xonomy.docSpec.elements[name];
+	if(!spec.attributes || typeof(spec.attributes)!="object") spec.attributes={};
+	if(!spec.menu || typeof(spec.menu)!="object") spec.menu=[];
+	if(!spec.inlineMenu || typeof(spec.inlineMenu)!="object") spec.inlineMenu=[];
+	if(!spec.canDropTo || typeof(spec.canDropTo)!="object") spec.canDropTo=[];
+	//if(!spec.mustBeAfter || typeof(spec.mustBeAfter)!="object") spec.mustBeAfter=[];
+	//if(!spec.mustBeBefore || typeof(spec.mustBeBefore)!="object") spec.mustBeBefore=[];
+	spec.mustBeAfter=Xonomy.asFunction(spec.mustBeAfter, []);
+	spec.mustBeBefore=Xonomy.asFunction(spec.mustBeBefore, []);
+	spec.oneliner=Xonomy.asFunction(spec.oneliner, false);
+	spec.hasText=Xonomy.asFunction(spec.hasText, false);
+	spec.collapsible=Xonomy.asFunction(spec.collapsible, true);
+	spec.collapsed=Xonomy.asFunction(spec.collapsed, false);
+	spec.localDropOnly=Xonomy.asFunction(spec.localDropOnly, false);
+	spec.isReadOnly=Xonomy.asFunction(spec.isReadOnly, false);
+	spec.isInvisible=Xonomy.asFunction(spec.isInvisible, false);
+	if(spec.displayName) spec.displayName=Xonomy.asFunction(spec.displayName, "");
+	if(spec.title) spec.title=Xonomy.asFunction(spec.title, "");
+	for(var i=0; i<spec.menu.length; i++) Xonomy.verifyDocSpecMenuItem(spec.menu[i]);
+	for(var i=0; i<spec.inlineMenu.length; i++) Xonomy.verifyDocSpecMenuItem(spec.inlineMenu[i]);
+	for(var attributeName in spec.attributes) Xonomy.verifyDocSpecAttribute(name, attributeName);
+};
+Xonomy.verifyDocSpecAttribute=function(elementName, attributeName) { //make sure the DocSpec object has such an attribute, that the attribute has everything it needs
+	var elSpec=Xonomy.docSpec.elements[elementName];
+	if(!elSpec.attributes[attributeName] || typeof(elSpec.attributes[attributeName])!="object") {
+		if(Xonomy.docSpec.unknownAttribute) {
+			elSpec.attributes[attributeName]=(typeof(Xonomy.docSpec.unknownAttribute)==="function")
+				? Xonomy.docSpec.unknownAttribute(elementName, attributeName)
+				: Xonomy.docSpec.unknownAttribute;
+		}
+		else elSpec.attributes[attributeName]={};
+	}
+	var spec=elSpec.attributes[attributeName];
+	if(!spec.asker || (typeof(spec.asker)!="function" && typeof(spec.asker)!="string")) spec.asker=function(){return ""};
+	else if(typeof(spec.asker)=="string"){
+		try {
+			if(typeof(eval(spec.asker))=="function")
+				spec.asker=eval(spec.asker);
+			else spec.asker=function(){return ""};
+		} catch(err) {
+			spec.asker=function(){return ""};
+		}
+	}
+	if(!spec.menu || typeof(spec.menu)!="object") spec.menu=[];
+	spec.isReadOnly=Xonomy.asFunction(spec.isReadOnly, false);
+	spec.isInvisible=Xonomy.asFunction(spec.isInvisible, false);
+	spec.shy=Xonomy.asFunction(spec.shy, false);
+	if(spec.displayName) spec.displayName=Xonomy.asFunction(spec.displayName, "");
+	if(spec.title) spec.title=Xonomy.asFunction(spec.title, "");
+	for(var i=0; i<spec.menu.length; i++) Xonomy.verifyDocSpecMenuItem(spec.menu[i]);
+};
+Xonomy.verifyDocSpecMenuItem=function(menuItem) { //make sure the menu item has all it needs
+	menuItem.caption=Xonomy.asFunction(menuItem.caption, "?");
+	if(!menuItem.action || (typeof(menuItem.action)!="function" && typeof(menuItem.action)!="string")) menuItem.action=function(){};
+	else if(typeof(menuItem.action)=="string"){
+		try {
+			if(typeof(eval(menuItem.action))=="function")
+				menuItem.action=eval(menuItem.action);
+			else menuItem.action=function(){return ""};
+		} catch(err) {
+			menuItem.action=function(){return ""};
+		}
+	}
+	if(!menuItem.hideIf) menuItem.hideIf=function(){return false;};
+	else if(typeof(menuItem.hideIf)=="string"){
+		try {
+			if(typeof(eval(menuItem.hideIf))=="function")
+				menuItem.hideIf=eval(menuItem.hideIf);
+		} catch(err) { }
+	}
+};
+
+
